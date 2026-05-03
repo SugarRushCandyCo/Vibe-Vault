@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STICKERHAUS — Premium Sticker Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,500;0,700;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --white:#ffffff;
+    --off:#f8f6f2;
+    --ink:#111111;
+    --accent:#ff3c3c;
+    --accent2:#ffd600;
+    --accent3:#00c9a7;
+    --accent4:#7b61ff;
+    --muted:#888;
+    --border:#e2e0da;
+    --card-shadow: 0 2px 0 #111, 4px 6px 0 #111;
+    --card-shadow-lg: 0 3px 0 #111, 6px 10px 0 #111;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--white);
+    color:var(--ink);
+    overflow-x:hidden;
+    cursor:none;
+  }
+
+  /* CUSTOM CURSOR */
+  #cursor{position:fixed;width:20px;height:20px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.15s ease,width 0.2s,height 0.2s,background 0.2s;mix-blend-mode:multiply}
+  #cursor.hovering{width:40px;height:40px;background:var(--accent2)}
+
+  /* NOISE OVERLAY */
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none;z-index:1000;opacity:0.4;
+  }
+
+  /* NAV */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.2rem 3rem;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(12px);
+    border-bottom:1.5px solid var(--border);
+  }
+  .nav-logo{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:2rem;letter-spacing:0.05em;
+    color:var(--ink);
+    text-decoration:none;
+    position:relative;
+  }
+  .nav-logo span{color:var(--accent)}
+  .nav-links{display:flex;gap:2.5rem;list-style:none}
+  .nav-links a{
+    font-size:0.85rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
+    text-decoration:none;color:var(--ink);
+    position:relative;
+  }
+  .nav-links a::after{
+    content:'';position:absolute;bottom:-3px;left:0;width:0;height:2px;
+    background:var(--accent);transition:width 0.25s ease;
+  }
+  .nav-links a:hover::after{width:100%}
+  .nav-cta{
+    background:var(--ink);color:var(--white);
+    padding:0.6rem 1.5rem;border:2px solid var(--ink);
+    font-weight:700;font-size:0.85rem;letter-spacing:0.05em;text-transform:uppercase;
+    cursor:none;text-decoration:none;
+    transition:background 0.2s,color 0.2s,transform 0.15s;
+    box-shadow:3px 3px 0 var(--accent);
+  }
+  .nav-cta:hover{background:var(--accent);border-color:var(--accent);transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+
+  /* HERO */
+  .hero{
+    min-height:100vh;
+    padding:8rem 3rem 4rem;
+    display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
+    position:relative;overflow:hidden;
+    background:var(--off);
+  }
+  .hero-bg-text{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(120px,20vw,280px);
+    color:transparent;-webkit-text-stroke:1.5px rgba(0,0,0,0.06);
+    white-space:nowrap;pointer-events:none;user-select:none;
+    animation:bgDrift 20s ease-in-out infinite;
+  }
+  @keyframes bgDrift{0%,100%{transform:translate(-50%,-50%) rotate(-2deg)}50%{transform:translate(-50%,-50%) rotate(2deg)}}
+
+  .hero-left{position:relative;z-index:2}
+  .hero-tag{
+    display:inline-flex;align-items:center;gap:0.5rem;
+    background:var(--accent);color:var(--white);
+    padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+    margin-bottom:1.5rem;
+    animation:slideInLeft 0.8s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .hero-tag::before{content:'★';animation:spin 4s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hero-h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(4rem,8vw,8rem);line-height:0.92;letter-spacing:0.02em;
+    margin-bottom:1.5rem;
+    animation:slideInLeft 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both;
+  }
+  .hero-h1 em{font-style:normal;color:var(--accent);display:block}
+  .hero-sub{
+    font-size:1.1rem;font-weight:300;color:#444;line-height:1.7;max-width:460px;
+    margin-bottom:2.5rem;
+    animation:slideInLeft 1s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+  }
+  .hero-actions{
+    display:flex;gap:1rem;flex-wrap:wrap;
+    animation:slideInLeft 1.1s cubic-bezier(0.16,1,0.3,1) 0.3s both;
+  }
+  .btn-primary{
+    background:var(--ink);color:var(--white);
+    padding:1rem 2.5rem;font-weight:700;font-size:1rem;letter-spacing:0.05em;text-transform:uppercase;
+    border:2px solid var(--ink);cursor:none;text-decoration:none;display:inline-block;
+    box-shadow:var(--card-shadow);
+    transition:transform 0.15s ease,box-shadow 0.15s ease,background 0.2s;
+  }
+  .btn-primary:hover{transform:translate(-4px,-4px);box-shadow:8px 14px 0 #111;background:var(--accent);border-color:var(--accent)}
+  .btn-secondary{
+    background:transparent;color:var(--ink);
+    padding:1rem 2.5rem;font-weight:700;font-size:1rem;letter-spacing:0.05em;text-transform:uppercase;
+    border:2px solid var(--ink);cursor:none;text-decoration:none;display:inline-block;
+    transition:transform 0.15s ease,box-shadow 0.15s ease,background 0.2s,color 0.2s;
+    box-shadow:var(--card-shadow);
+  }
+  .btn-secondary:hover{transform:translate(-4px,-4px);box-shadow:8px 14px 0 #111;background:var(--ink);color:var(--white)}
+
+  /* FLOATING STICKER PILE */
+  .hero-right{
+    position:relative;z-index:2;height:600px;
+    animation:slideInRight 1s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+  }
+  .sticker-pile{position:relative;width:100%;height:100%}
+  .sticker-card{
+    position:absolute;
+    background:var(--white);
+    border:2.5px solid var(--ink);
+    border-radius:16px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;
+    box-shadow:var(--card-shadow-lg);
+    cursor:none;
+    transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    transform-style:preserve-3d;
+    perspective:800px;
+  }
+  .sticker-card:hover{transform:translateY(-12px) rotate(0deg) scale(1.05) !important}
+  .sticker-card .emoji{font-size:4rem;line-height:1;filter:drop-shadow(2px 4px 0 rgba(0,0,0,0.15))}
+  .sticker-card .label{font-family:'Space Mono',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+  .sticker-card .price{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--ink)}
+
+  .sc1{width:160px;height:180px;top:30px;left:60px;background:#fff3cd;transform:rotate(-8deg);animation:float1 6s ease-in-out infinite}
+  .sc2{width:140px;height:160px;top:20px;right:80px;background:#fce4ec;transform:rotate(6deg);animation:float2 7s ease-in-out infinite}
+  .sc3{width:180px;height:200px;top:180px;left:20px;background:#e8f5e9;transform:rotate(3deg);animation:float3 8s ease-in-out infinite}
+  .sc4{width:155px;height:175px;top:160px;right:30px;background:#e3f2fd;transform:rotate(-5deg);animation:float1 5.5s ease-in-out 1s infinite}
+  .sc5{width:145px;height:165px;top:360px;left:140px;background:#f3e5f5;transform:rotate(9deg);animation:float2 6.5s ease-in-out 0.5s infinite}
+  .sc6{width:160px;height:180px;top:360px;right:100px;background:#fff8e1;transform:rotate(-4deg);animation:float3 7.5s ease-in-out 1.5s infinite}
+
+  @keyframes float1{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(-6deg) translateY(-18px)}}
+  @keyframes float2{0%,100%{transform:rotate(6deg) translateY(0)}50%{transform:rotate(8deg) translateY(-22px)}}
+  @keyframes float3{0%,100%{transform:rotate(3deg) translateY(0)}50%{transform:rotate(1deg) translateY(-15px)}}
+
+  @keyframes slideInLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+
+  /* TICKER STRIP */
+  .ticker{
+    background:var(--accent);color:var(--white);
+    padding:0.9rem 0;overflow:hidden;
+    border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  }
+  .ticker-inner{
+    display:flex;gap:3rem;
+    animation:ticker 18s linear infinite;
+    white-space:nowrap;
+  }
+  .ticker-item{
+    display:flex;align-items:center;gap:1rem;
+    font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:0.08em;
+  }
+  .ticker-dot{width:8px;height:8px;background:var(--accent2);border-radius:50%;flex-shrink:0}
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* SECTION SHARED */
+  section{padding:6rem 3rem}
+  .section-tag{
+    display:inline-flex;align-items:center;gap:0.5rem;
+    font-family:'Space Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:1rem;
+  }
+  .section-tag::before{content:'//';opacity:0.4}
+  .section-h2{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(3rem,5vw,5.5rem);line-height:0.9;letter-spacing:0.02em;
+    margin-bottom:3rem;
+  }
+
+  /* PRODUCT GRID */
+  .products-section{background:var(--white)}
+  .product-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:1.5rem;
+  }
+  .product-card{
+    border:2px solid var(--ink);
+    background:var(--white);
+    position:relative;overflow:hidden;
+    transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s ease;
+    box-shadow:var(--card-shadow);
+    cursor:none;
+  }
+  .product-card:hover{transform:translate(-5px,-5px);box-shadow:9px 13px 0 var(--ink)}
+  .product-card-img{
+    background:var(--off);
+    height:240px;display:flex;align-items:center;justify-content:center;
+    font-size:5rem;border-bottom:2px solid var(--ink);
+    position:relative;overflow:hidden;
+    transition:background 0.3s;
+  }
+  .product-card:hover .product-card-img{background:#fff0f0}
+  .product-card-img .emoji-3d{
+    transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1),filter 0.3s;
+    filter:drop-shadow(4px 8px 0 rgba(0,0,0,0.2));
+    transform-style:preserve-3d;
+  }
+  .product-card:hover .emoji-3d{transform:scale(1.25) rotate(-8deg);filter:drop-shadow(6px 12px 0 rgba(0,0,0,0.25))}
+  .badge{
+    position:absolute;top:12px;right:12px;
+    background:var(--accent);color:var(--white);
+    font-family:'Space Mono',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.05em;
+    padding:0.3rem 0.6rem;border:1.5px solid var(--ink);
+  }
+  .badge.new{background:var(--accent3)}
+  .badge.sale{background:var(--accent2);color:var(--ink)}
+  .product-card-body{padding:1.2rem}
+  .product-name{font-weight:700;font-size:1rem;margin-bottom:0.2rem;letter-spacing:0.02em}
+  .product-desc{font-size:0.82rem;color:var(--muted);margin-bottom:1rem}
+  .product-footer{display:flex;align-items:center;justify-content:space-between}
+  .product-price{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--ink)}
+  .add-btn{
+    background:var(--ink);color:var(--white);
+    border:2px solid var(--ink);padding:0.4rem 1rem;
+    font-weight:700;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;
+    cursor:none;transition:background 0.2s,color 0.2s,transform 0.15s;
+  }
+  .add-btn:hover{background:var(--accent);border-color:var(--accent);transform:scale(1.05)}
+
+  /* CATEGORIES */
+  .categories-section{background:var(--off);border-top:2px solid var(--border);border-bottom:2px solid var(--border)}
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+  .cat-card{
+    border:2px solid var(--ink);padding:2rem 1.5rem;
+    display:flex;flex-direction:column;align-items:center;gap:0.75rem;
+    text-align:center;cursor:none;
+    background:var(--white);
+    box-shadow:var(--card-shadow);
+    transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s,background 0.2s;
+    position:relative;overflow:hidden;
+  }
+  .cat-card::before{
+    content:'';position:absolute;bottom:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+    transform:scaleX(0);transform-origin:left;
+    transition:transform 0.3s ease;
+  }
+  .cat-card:hover{transform:translate(-4px,-4px);box-shadow:8px 12px 0 var(--ink);background:#fff}
+  .cat-card:hover::before{transform:scaleX(1)}
+  .cat-icon{
+    font-size:3rem;
+    transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    filter:drop-shadow(2px 4px 0 rgba(0,0,0,0.12));
+  }
+  .cat-card:hover .cat-icon{transform:scale(1.3) rotate(-10deg)}
+  .cat-name{font-weight:700;font-size:0.95rem;letter-spacing:0.03em}
+  .cat-count{font-size:0.78rem;color:var(--muted);font-family:'Space Mono',monospace}
+
+  /* 3D SHOWCASE */
+  .showcase-section{background:var(--ink);color:var(--white);overflow:hidden;position:relative}
+  .showcase-section .section-tag{color:var(--accent2)}
+  .showcase-section .section-h2{color:var(--white)}
+  .showcase-section .section-h2 span{color:var(--accent)}
+  .scene-3d{
+    display:flex;justify-content:center;align-items:center;height:400px;
+    perspective:1000px;position:relative;
+  }
+  .cube-wrap{
+    position:relative;width:200px;height:200px;
+    transform-style:preserve-3d;
+    animation:rotateCube 12s linear infinite;
+  }
+  @keyframes rotateCube{from{transform:rotateX(-20deg) rotateY(0)}to{transform:rotateX(-20deg) rotateY(360deg)}}
+  .cube-face{
+    position:absolute;width:200px;height:200px;
+    border:3px solid rgba(255,255,255,0.15);
+    display:flex;align-items:center;justify-content:center;
+    font-size:5rem;
+    backface-visibility:hidden;
+  }
+  .face-front {background:rgba(255,60,60,0.15);transform:translateZ(100px)}
+  .face-back  {background:rgba(123,97,255,0.15);transform:rotateY(180deg) translateZ(100px)}
+  .face-left  {background:rgba(0,201,167,0.15);transform:rotateY(-90deg) translateZ(100px)}
+  .face-right {background:rgba(255,214,0,0.15);transform:rotateY(90deg) translateZ(100px)}
+  .face-top   {background:rgba(255,255,255,0.1);transform:rotateX(90deg) translateZ(100px)}
+  .face-bottom{background:rgba(255,255,255,0.05);transform:rotateX(-90deg) translateZ(100px)}
+  .showcase-content{max-width:500px}
+  .showcase-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+  .feature-list{list-style:none;display:flex;flex-direction:column;gap:1rem}
+  .feature-list li{
+    display:flex;align-items:flex-start;gap:1rem;
+    padding:1rem;border:1px solid rgba(255,255,255,0.1);
+    transition:border-color 0.2s,background 0.2s;
+  }
+  .feature-list li:hover{border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.04)}
+  .feature-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}
+  .feature-text h4{font-weight:700;margin-bottom:0.3rem;font-size:0.95rem}
+  .feature-text p{font-size:0.82rem;color:rgba(255,255,255,0.55);line-height:1.6}
+
+  /* SCROLL RIBBON */
+  .ribbon{
+    background:var(--accent2);padding:0.75rem 0;overflow:hidden;
+    border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  }
+  .ribbon-inner{display:flex;gap:2rem;animation:ticker 14s linear infinite reverse;white-space:nowrap}
+  .ribbon-item{
+    font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.06em;
+    color:var(--ink);display:flex;align-items:center;gap:1.5rem;flex-shrink:0;
+  }
+  .ribbon-item::after{content:'✦';color:var(--accent);font-size:0.9rem}
+
+  /* PACK CAROUSEL */
+  .pack-carousel-wrap{
+    display:flex;align-items:center;gap:1.5rem;
+    position:relative;
+  }
+  .pack-carousel-viewport{
+    flex:1;overflow:hidden;
+  }
+  .pack-carousel-track{
+    display:flex;gap:1.5rem;
+    transition:transform 0.45s cubic-bezier(0.16,1,0.3,1);
+    will-change:transform;
+  }
+  .pack-carousel-track .pack-card{
+    flex:0 0 100%;min-width:0;
+  }
+  .pack-arrow{
+    flex-shrink:0;
+    width:54px;height:54px;
+    background:var(--ink);color:var(--white);
+    border:2px solid var(--ink);
+    font-size:1.3rem;font-weight:700;
+    cursor:none;
+    box-shadow:3px 3px 0 var(--accent);
+    transition:transform 0.15s,box-shadow 0.15s,background 0.2s;
+    display:flex;align-items:center;justify-content:center;
+    letter-spacing:0;
+  }
+  .pack-arrow:hover{background:var(--accent);border-color:var(--accent);transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+  .pack-arrow:active{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}
+  .pack-dots{
+    display:flex;gap:0.6rem;justify-content:center;margin-top:1.5rem;
+  }
+  .pack-dot{
+    width:10px;height:10px;border-radius:50%;
+    background:transparent;border:2px solid var(--ink);
+    cursor:none;padding:0;
+    transition:background 0.2s,transform 0.2s;
+  }
+  .pack-dot.active{background:var(--ink);transform:scale(1.2)}
+  .pack-counter{
+    text-align:center;margin-top:0.75rem;
+    font-family:'Space Mono',monospace;font-size:0.7rem;
+    color:var(--muted);letter-spacing:0.1em;
+  }
+  .placeholder-pack{opacity:0.6}
+
+  /* PACK DEALS */
+  .packs-section{background:var(--off)}
+  .pack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+  @media(max-width:900px){.pack-grid{grid-template-columns:1fr}}
+  .pack-card{
+    border:2px solid var(--ink);background:var(--white);
+    padding:2.5rem 2rem;position:relative;
+    box-shadow:var(--card-shadow);
+    transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s;
+    cursor:none;
+    transform-style:preserve-3d;
+  }
+  .pack-card:hover{transform:translate(-5px,-8px) rotateX(3deg);box-shadow:10px 18px 0 var(--ink)}
+  .pack-card.featured{background:var(--ink);color:var(--white)}
+  .pack-card.featured .pack-desc{color:rgba(255,255,255,0.6)}
+  .pack-label{
+    font-family:'Space Mono',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:0.5rem;
+  }
+  .pack-card.featured .pack-label{color:rgba(255,255,255,0.5)}
+  .pack-name{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:0.03em;margin-bottom:0.5rem}
+  .pack-price{
+    font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;
+    color:var(--accent);margin-bottom:0.5rem;
+  }
+  .pack-card.featured .pack-price{color:var(--accent2)}
+  .pack-desc{font-size:0.85rem;color:var(--muted);margin-bottom:2rem;line-height:1.6}
+  .pack-features{list-style:none;display:flex;flex-direction:column;gap:0.6rem;margin-bottom:2rem}
+  .pack-features li{
+    display:flex;align-items:center;gap:0.75rem;
+    font-size:0.88rem;
+  }
+  .pack-features li::before{
+    content:'→';color:var(--accent);font-weight:700;
+  }
+  .pack-card.featured .pack-features li::before{color:var(--accent2)}
+  .pack-btn{
+    width:100%;padding:1rem;
+    background:var(--accent);color:var(--white);
+    border:2px solid var(--ink);font-weight:700;font-size:0.9rem;letter-spacing:0.08em;text-transform:uppercase;
+    cursor:none;text-align:center;display:block;text-decoration:none;
+    transition:transform 0.15s,box-shadow 0.15s,background 0.2s;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .pack-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 7px 0 var(--ink);background:#e62e2e}
+  .pack-card.featured .pack-btn{background:var(--accent2);color:var(--ink)}
+  .pack-card.featured .pack-btn:hover{background:#ffcd00}
+  .popular-badge{
+    position:absolute;top:-1px;right:20px;
+    background:var(--accent);color:var(--white);
+    font-family:'Space Mono',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+    padding:0.4rem 0.8rem;border:2px solid var(--ink);border-top:none;
+  }
+  .pack-card.featured .popular-badge{background:var(--accent2);color:var(--ink)}
+
+  /* TESTIMONIALS */
+  .testimonials-section{background:var(--white);border-top:2px solid var(--border)}
+  .testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+  .testi-card{
+    border:2px solid var(--ink);padding:2rem;
+    box-shadow:var(--card-shadow);
+    transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s;
+    cursor:none;background:var(--white);
+  }
+  .testi-card:hover{transform:translate(-4px,-4px);box-shadow:8px 12px 0 var(--ink)}
+  .stars{color:var(--accent2);font-size:1rem;margin-bottom:0.75rem;letter-spacing:0.1em}
+  .testi-text{font-size:0.9rem;line-height:1.7;margin-bottom:1.25rem;font-style:italic}
+  .testi-author{display:flex;align-items:center;gap:0.75rem}
+  .testi-avatar{
+    width:40px;height:40px;border-radius:50%;
+    background:var(--accent);border:2px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.2rem;flex-shrink:0;
+  }
+  .testi-name{font-weight:700;font-size:0.88rem}
+  .testi-role{font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+
+  /* NEWSLETTER */
+  .newsletter-section{
+    background:var(--accent);color:var(--white);
+    padding:5rem 3rem;text-align:center;
+    border-top:2px solid var(--ink);
+    position:relative;overflow:hidden;
+  }
+  .newsletter-section::before{
+    content:'📬';position:absolute;
+    font-size:25rem;top:50%;left:-5%;transform:translateY(-50%) rotate(-15deg);
+    opacity:0.05;pointer-events:none;
+  }
+  .newsletter-section::after{
+    content:'✉️';position:absolute;
+    font-size:18rem;top:50%;right:-3%;transform:translateY(-50%) rotate(10deg);
+    opacity:0.05;pointer-events:none;
+  }
+  .nl-h2{
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,6vw,5.5rem);
+    line-height:0.9;margin-bottom:1rem;
+  }
+  .nl-sub{font-size:1rem;opacity:0.85;margin-bottom:2.5rem;font-weight:300}
+  .nl-form{
+    display:flex;gap:0;max-width:520px;margin:0 auto;
+    border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink);
+  }
+  .nl-input{
+    flex:1;padding:1rem 1.5rem;border:none;background:var(--white);
+    font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--ink);
+    outline:none;
+  }
+  .nl-btn{
+    background:var(--ink);color:var(--white);
+    padding:1rem 2rem;border:none;font-weight:700;font-size:0.9rem;
+    letter-spacing:0.08em;text-transform:uppercase;cursor:none;
+    transition:background 0.2s;flex-shrink:0;
+  }
+  .nl-btn:hover{background:#333}
+
+  /* FOOTER */
+  footer{
+    background:var(--ink);color:var(--white);
+    padding:4rem 3rem 2rem;
+    border-top:2px solid var(--border);
+  }
+  .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+  @media(max-width:800px){.footer-grid{grid-template-columns:1fr 1fr}}
+  .footer-brand{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;margin-bottom:0.75rem}
+  .footer-brand span{color:var(--accent)}
+  .footer-tagline{font-size:0.85rem;color:rgba(255,255,255,0.5);line-height:1.7;max-width:260px}
+  .footer-col h4{font-weight:700;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.25rem;color:rgba(255,255,255,0.5)}
+  .footer-col a{display:block;color:rgba(255,255,255,0.75);text-decoration:none;font-size:0.9rem;margin-bottom:0.6rem;transition:color 0.2s}
+  .footer-col a:hover{color:var(--accent)}
+  .footer-bottom{border-top:1px solid rgba(255,255,255,0.1);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:rgba(255,255,255,0.4)}
+
+  /* SCROLL REVEAL */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+  .reveal.visible{opacity:1;transform:translateY(0)}
+
+  /* CART TOAST */
+  .toast{
+    position:fixed;bottom:2rem;right:2rem;z-index:500;
+    background:var(--ink);color:var(--white);
+    padding:1rem 1.5rem;border:2px solid var(--ink);
+    font-weight:700;font-size:0.9rem;
+    box-shadow:5px 5px 0 var(--accent);
+    display:flex;align-items:center;gap:0.75rem;
+    transform:translateX(calc(100% + 3rem));
+    transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .toast.show{transform:translateX(0)}
+
+  /* PLACEHOLDERS */
+  .placeholder-text{
+    background:linear-gradient(90deg,#e8e6e0 25%,#f2f0eb 50%,#e8e6e0 75%);
+    background-size:200% 100%;
+    animation:shimmer 1.8s infinite;
+    border-radius:4px;display:block;
+  }
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .placeholder-card{cursor:default !important}
+  .placeholder-img{
+    background:repeating-linear-gradient(45deg,#f0ede6,#f0ede6 8px,#f8f6f2 8px,#f8f6f2 16px) !important;
+    flex-direction:column;gap:0.5rem;
+  }
+  .placeholder-icon{
+    font-size:2rem;color:rgba(0,0,0,0.15);
+    font-weight:300;line-height:1;
+  }
+  .placeholder-icon-lg{font-size:2.2rem;color:rgba(0,0,0,0.15);font-weight:300;line-height:1}
+  .placeholder-label{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(0,0,0,0.2)}
+  .placeholder-avatar{background:#e0ddd7 !important;border:2px solid #ccc8c0 !important}
+
+  /* PACK DROPDOWN */
+  .pack-dropdown-wrap{margin-top:1.5rem}
+  .pack-dropdown-toggle{
+    width:100%;display:flex;align-items:center;justify-content:space-between;
+    background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.25);
+    color:var(--white);padding:0.75rem 1rem;cursor:none;
+    font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;letter-spacing:0.04em;
+    transition:background 0.2s,border-color 0.2s;
+  }
+  .pack-dropdown-toggle:hover{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.4)}
+  .pack-dropdown-toggle[aria-expanded="true"] .dropdown-arrow{transform:rotate(180deg)}
+  .dropdown-arrow{transition:transform 0.25s ease;font-size:1rem;opacity:0.7}
+  .pack-dropdown-list{
+    list-style:none;
+    border:1.5px solid rgba(255,255,255,0.2);border-top:none;
+    overflow:hidden;
+    animation:dropDown 0.25s cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes dropDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+  .pack-dropdown-list li{
+    display:flex;align-items:center;gap:0.9rem;
+    padding:0.85rem 1rem;border-bottom:1px solid rgba(255,255,255,0.1);
+    transition:background 0.15s;
+  }
+  .pack-dropdown-list li:last-child{border-bottom:none}
+  .pack-dropdown-list li:hover{background:rgba(255,255,255,0.07)}
+  .drop-emoji{font-size:1.6rem;flex-shrink:0;filter:drop-shadow(1px 2px 0 rgba(0,0,0,0.3))}
+  .pack-dropdown-list li div{display:flex;flex-direction:column;gap:2px}
+  .pack-dropdown-list li strong{font-size:0.88rem;font-weight:700}
+  .pack-dropdown-list li span{font-size:0.75rem;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace}
+
+  @media(max-width:768px){
+    nav{padding:1rem 1.5rem}
+    .nav-links{display:none}
+    .hero{grid-template-columns:1fr;padding:6rem 1.5rem 3rem}
+    .hero-right{height:380px}
+    .sc1,.sc2,.sc3,.sc4,.sc5,.sc6{transform:scale(0.8) !important}
+    section{padding:4rem 1.5rem}
+    .showcase-grid{grid-template-columns:1fr}
+    .pack-grid{grid-template-columns:1fr}
+    .footer-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">STICKER<span>HAUS</span></a>
+  <ul class="nav-links">
+    <li><a href="#products">Shop</a></li>
+    <li><a href="#categories">Categories</a></li>
+    <li><a href="#packs">Packs</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Cart (0)</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">STICKERS</div>
+  <div class="hero-left">
+    <div class="hero-tag">Free shipping on orders $30+</div>
+    <h1 class="hero-h1">Stick it<em>your way.</em></h1>
+    <p class="hero-sub">Premium matte vinyl stickers that are waterproof, kiss-cut, and built to last. From laptops to water bottles — we've got the perfect peel.</p>
+    <div class="hero-actions">
+      <a href="#products" class="btn-primary">Shop Now</a>
+      <a href="#packs" class="btn-secondary">View Packs</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="sticker-pile">
+      <div class="sticker-card sc1"><div class="emoji">🌿</div><div class="label">Botanica</div><div class="price">$3.99</div></div>
+      <div class="sticker-card sc2"><div class="emoji">🔥</div><div class="label">Flame Pack</div><div class="price">$2.99</div></div>
+      <div class="sticker-card sc3"><div class="emoji">🌊</div><div class="label">Wave Rider</div><div class="price">$3.49</div></div>
+      <div class="sticker-card sc4"><div class="emoji">⚡</div><div class="label">Voltage</div><div class="price">$2.49</div></div>
+      <div class="sticker-card sc5"><div class="emoji">🦋</div><div class="label">Flutter</div><div class="price">$3.99</div></div>
+      <div class="sticker-card sc6"><div class="emoji">🍕</div><div class="label">Foodie</div><div class="price">$2.99</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <div class="ticker-item"><div class="ticker-dot"></div>Waterproof Vinyl</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Kiss Cut Precision</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>100% Matte Finish</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Bubble Free Backing</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Ships in 24hrs</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Hundreds of Designs</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Custom Orders</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Waterproof Vinyl</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Kiss Cut Precision</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>100% Matte Finish</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Bubble Free Backing</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Ships in 24hrs</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Hundreds of Designs</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Custom Orders</div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<section class="products-section" id="products">
+  <div class="reveal">
+    <div class="section-tag">Featured</div>
+    <h2 class="section-h2">HOT<br>RIGHT NOW</h2>
+  </div>
+  <div class="product-grid">
+    <div class="product-card placeholder-card reveal">
+      <div class="product-card-img placeholder-img"><div class="placeholder-icon">＋</div><div class="placeholder-label">Product Slot</div></div>
+      <div class="product-card-body">
+        <div class="product-name placeholder-text" style="width:60%;height:14px;"></div>
+        <div class="product-desc placeholder-text" style="width:85%;height:10px;margin-top:6px;"></div>
+        <div class="product-footer" style="margin-top:1rem"><span class="product-price placeholder-text" style="width:50px;height:20px;display:inline-block"></span><button class="add-btn" style="opacity:0.3;pointer-events:none">Add +</button></div>
+      </div>
+    </div>
+    <div class="product-card placeholder-card reveal">
+      <div class="product-card-img placeholder-img"><div class="placeholder-icon">＋</div><div class="placeholder-label">Product Slot</div></div>
+      <div class="product-card-body">
+        <div class="product-name placeholder-text" style="width:70%;height:14px;"></div>
+        <div class="product-desc placeholder-text" style="width:90%;height:10px;margin-top:6px;"></div>
+        <div class="product-footer" style="margin-top:1rem"><span class="product-price placeholder-text" style="width:50px;height:20px;display:inline-block"></span><button class="add-btn" style="opacity:0.3;pointer-events:none">Add +</button></div>
+      </div>
+    </div>
+    <div class="product-card placeholder-card reveal">
+      <div class="product-card-img placeholder-img"><div class="placeholder-icon">＋</div><div class="placeholder-label">Product Slot</div></div>
+      <div class="product-card-body">
+        <div class="product-name placeholder-text" style="width:55%;height:14px;"></div>
+        <div class="product-desc placeholder-text" style="width:80%;height:10px;margin-top:6px;"></div>
+        <div class="product-footer" style="margin-top:1rem"><span class="product-price placeholder-text" style="width:50px;height:20px;display:inline-block"></span><button class="add-btn" style="opacity:0.3;pointer-events:none">Add +</button></div>
+      </div>
+    </div>
+    <div class="product-card placeholder-card reveal">
+      <div class="product-card-img placeholder-img"><div class="placeholder-icon">＋</div><div class="placeholder-label">Product Slot</div></div>
+      <div class="product-card-body">
+        <div class="product-name placeholder-text" style="width:65%;height:14px;"></div>
+        <div class="product-desc placeholder-text" style="width:75%;height:10px;margin-top:6px;"></div>
+        <div class="product-footer" style="margin-top:1rem"><span class="product-price placeholder-text" style="width:50px;height:20px;display:inline-block"></span><button class="add-btn" style="opacity:0.3;pointer-events:none">Add +</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories-section" id="categories">
+  <div class="reveal">
+    <div class="section-tag">Browse</div>
+    <h2 class="section-h2">SHOP BY<br>VIBE</h2>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card placeholder-card reveal"><div class="placeholder-icon-lg">＋</div><div class="cat-name placeholder-text" style="width:80px;height:12px;margin:0 auto"></div><div class="cat-count" style="opacity:0.3">— stickers</div></div>
+    <div class="cat-card placeholder-card reveal"><div class="placeholder-icon-lg">＋</div><div class="cat-name placeholder-text" style="width:80px;height:12px;margin:0 auto"></div><div class="cat-count" style="opacity:0.3">— stickers</div></div>
+    <div class="cat-card placeholder-card reveal"><div class="placeholder-icon-lg">＋</div><div class="cat-name placeholder-text" style="width:80px;height:12px;margin:0 auto"></div><div class="cat-count" style="opacity:0.3">— stickers</div></div>
+    <div class="cat-card placeholder-card reveal"><div class="placeholder-icon-lg">＋</div><div class="cat-name placeholder-text" style="width:80px;height:12px;margin:0 auto"></div><div class="cat-count" style="opacity:0.3">— stickers</div></div>
+    <div class="cat-card placeholder-card reveal"><div class="placeholder-icon-lg">＋</div><div class="cat-name placeholder-text" style="width:80px;height:12px;margin:0 auto"></div><div class="cat-count" style="opacity:0.3">— stickers</div></div>
+    <div class="cat-card placeholder-card reveal"><div class="placeholder-icon-lg">＋</div><div class="cat-name placeholder-text" style="width:80px;height:12px;margin:0 auto"></div><div class="cat-count" style="opacity:0.3">— stickers</div></div>
+  </div>
+</section>
+
+<!-- 3D SHOWCASE -->
+<section class="showcase-section" id="about">
+  <div class="showcase-grid">
+    <div class="showcase-content reveal">
+      <div class="section-tag">Why Us</div>
+      <h2 class="section-h2">BUILT FOR<br><span>STICK-ERS.</span></h2>
+      <ul class="feature-list">
+        <li>
+          <div class="feature-icon">🎯</div>
+          <div class="feature-text">
+            <h4>Precision Kiss-Cut</h4>
+            <p>Our cutter traces every curve with 0.1mm accuracy so your sticker peels perfectly every time.</p>
+          </div>
+        </li>
+        <li>
+          <div class="feature-icon">💧</div>
+          <div class="feature-text">
+            <h4>Truly Waterproof</h4>
+            <p>UV-laminated vinyl that handles rain, dishwashers, and your chaotic life without peeling.</p>
+          </div>
+        </li>
+        <li>
+          <div class="feature-icon">🌈</div>
+          <div class="feature-text">
+            <h4>Vivid Ink Printing</h4>
+            <p>12-color CMYK+ process for colors that pop off the page and stay bright for years.</p>
+          </div>
+        </li>
+        <li>
+          <div class="feature-icon">📦</div>
+          <div class="feature-text">
+            <h4>Ships Same Day</h4>
+            <p>Orders before 3PM ET ship today. Eco-friendly packaging included free.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="scene-3d reveal">
+      <div class="cube-wrap">
+        <div class="cube-face face-front">🌿</div>
+        <div class="cube-face face-back">🔥</div>
+        <div class="cube-face face-left">⚡</div>
+        <div class="cube-face face-right">🌊</div>
+        <div class="cube-face face-top">🦋</div>
+        <div class="cube-face face-bottom">💫</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-inner">
+    <div class="ribbon-item">Premium Vinyl</div>
+    <div class="ribbon-item">Bubble Free</div>
+    <div class="ribbon-item">Matte Finish</div>
+    <div class="ribbon-item">Dishwasher Safe</div>
+    <div class="ribbon-item">5-Year Guarantee</div>
+    <div class="ribbon-item">Custom Cuts</div>
+    <div class="ribbon-item">Fast Shipping</div>
+    <div class="ribbon-item">Premium Vinyl</div>
+    <div class="ribbon-item">Bubble Free</div>
+    <div class="ribbon-item">Matte Finish</div>
+    <div class="ribbon-item">Dishwasher Safe</div>
+    <div class="ribbon-item">5-Year Guarantee</div>
+    <div class="ribbon-item">Custom Cuts</div>
+    <div class="ribbon-item">Fast Shipping</div>
+  </div>
+</div>
+
+<!-- PACKS -->
+<section class="packs-section" id="packs">
+  <div class="reveal">
+    <div class="section-tag">Value Bundles</div>
+    <h2 class="section-h2">PICK YOUR<br>PACK</h2>
+  </div>
+
+  <div class="pack-carousel-wrap">
+    <button class="pack-arrow pack-arrow-left" onclick="shiftPack(-1)" aria-label="Previous pack">←</button>
+
+    <div class="pack-carousel-viewport">
+      <div class="pack-carousel-track" id="packTrack">
+
+        <!-- SEA LIFE PACK -->
+        <div class="pack-card featured">
+          <div class="pack-label">Theme Pack</div>
+          <div class="pack-name">Sea Life Pack</div>
+          <div class="pack-price">—</div>
+          <div class="pack-desc">Dive deep with our ocean-themed collection. Every creature of the sea, kiss-cut and ready to stick.</div>
+          <div class="pack-dropdown-wrap">
+            <button class="pack-dropdown-toggle" onclick="toggleDropdown(this)" aria-expanded="false">
+              <span>What's included</span>
+              <span class="dropdown-arrow">▾</span>
+            </button>
+            <ul class="pack-dropdown-list" hidden>
+              <li><span class="drop-emoji">🦈</span><div><strong>Shark Sticker</strong><span>Great white, 4" matte vinyl</span></div></li>
+              <li><span class="drop-emoji">🐠</span><div><strong>Clownfish Sticker</strong><span>Matte orange &amp; white, 3"</span></div></li>
+              <li><span class="drop-emoji">🪼</span><div><strong>Jellyfish Sticker</strong><span>Matte pastel, 3.5" die-cut</span></div></li>
+              <li><span class="drop-emoji">🐢</span><div><strong>Sea Turtle Sticker</strong><span>Matte green, 4" weatherproof</span></div></li>
+              <li><span class="drop-emoji">🦀</span><div><strong>Crab Sticker</strong><span>Matte red, 3" precision cut</span></div></li>
+            </ul>
+          </div>
+          <a href="#" class="pack-btn" style="margin-top:1.5rem">Get Sea Life Pack</a>
+        </div>
+
+        <!-- PLACEHOLDER PACK 2 -->
+        <div class="pack-card featured placeholder-pack">
+          <div class="pack-label" style="opacity:0.4">Coming Soon</div>
+          <div class="pack-name" style="opacity:0.25">— — —</div>
+          <div class="pack-price" style="opacity:0.2">—</div>
+          <div class="pack-desc placeholder-text" style="width:80%;height:10px;margin-bottom:0.5rem"></div>
+          <div class="pack-desc placeholder-text" style="width:60%;height:10px;margin-bottom:2rem"></div>
+          <div class="pack-dropdown-wrap">
+            <button class="pack-dropdown-toggle" style="opacity:0.3;pointer-events:none" aria-expanded="false">
+              <span>What's included</span>
+              <span class="dropdown-arrow">▾</span>
+            </button>
+          </div>
+          <a href="#" class="pack-btn" style="margin-top:1.5rem;opacity:0.3;pointer-events:none">Pack Slot</a>
+        </div>
+
+        <!-- PLACEHOLDER PACK 3 -->
+        <div class="pack-card featured placeholder-pack">
+          <div class="pack-label" style="opacity:0.4">Coming Soon</div>
+          <div class="pack-name" style="opacity:0.25">— — —</div>
+          <div class="pack-price" style="opacity:0.2">—</div>
+          <div class="pack-desc placeholder-text" style="width:75%;height:10px;margin-bottom:0.5rem"></div>
+          <div class="pack-desc placeholder-text" style="width:65%;height:10px;margin-bottom:2rem"></div>
+          <div class="pack-dropdown-wrap">
+            <button class="pack-dropdown-toggle" style="opacity:0.3;pointer-events:none" aria-expanded="false">
+              <span>What's included</span>
+              <span class="dropdown-arrow">▾</span>
+            </button>
+          </div>
+          <a href="#" class="pack-btn" style="margin-top:1.5rem;opacity:0.3;pointer-events:none">Pack Slot</a>
+        </div>
+
+      </div>
+    </div>
+
+    <button class="pack-arrow pack-arrow-right" onclick="shiftPack(1)" aria-label="Next pack">→</button>
+  </div>
+
+  <div class="pack-dots" id="packDots">
+    <button class="pack-dot active" onclick="goToPack(0)"></button>
+    <button class="pack-dot" onclick="goToPack(1)"></button>
+    <button class="pack-dot" onclick="goToPack(2)"></button>
+  </div>
+
+  <p class="pack-counter" id="packCounter">1 / 3</p>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="reveal">
+    <div class="section-tag">Reviews</div>
+    <h2 class="section-h2">STICKER<br>LOVERS SPEAK</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card placeholder-card reveal">
+      <div class="stars" style="opacity:0.2">★★★★★</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">
+        <div class="placeholder-text" style="width:95%;height:10px"></div>
+        <div class="placeholder-text" style="width:80%;height:10px"></div>
+        <div class="placeholder-text" style="width:88%;height:10px"></div>
+      </div>
+      <div class="testi-author">
+        <div class="testi-avatar placeholder-avatar"></div>
+        <div><div class="placeholder-text" style="width:90px;height:11px;margin-bottom:5px"></div><div class="placeholder-text" style="width:70px;height:9px"></div></div>
+      </div>
+    </div>
+    <div class="testi-card placeholder-card reveal">
+      <div class="stars" style="opacity:0.2">★★★★★</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">
+        <div class="placeholder-text" style="width:90%;height:10px"></div>
+        <div class="placeholder-text" style="width:75%;height:10px"></div>
+        <div class="placeholder-text" style="width:83%;height:10px"></div>
+      </div>
+      <div class="testi-author">
+        <div class="testi-avatar placeholder-avatar"></div>
+        <div><div class="placeholder-text" style="width:100px;height:11px;margin-bottom:5px"></div><div class="placeholder-text" style="width:65px;height:9px"></div></div>
+      </div>
+    </div>
+    <div class="testi-card placeholder-card reveal">
+      <div class="stars" style="opacity:0.2">★★★★★</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:1.25rem">
+        <div class="placeholder-text" style="width:85%;height:10px"></div>
+        <div class="placeholder-text" style="width:92%;height:10px"></div>
+        <div class="placeholder-text" style="width:70%;height:10px"></div>
+      </div>
+      <div class="testi-author">
+        <div class="testi-avatar placeholder-avatar"></div>
+        <div><div class="placeholder-text" style="width:80px;height:11px;margin-bottom:5px"></div><div class="placeholder-text" style="width:75px;height:9px"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter-section">
+  <div class="reveal">
+    <h2 class="nl-h2">GET THE DROP.<br>FIRST.</h2>
+    <p class="nl-sub">New stickers, exclusive packs, and secret sales — your inbox deserves it.</p>
+    <div class="nl-form">
+      <input class="nl-input" type="email" placeholder="your@email.com">
+      <button class="nl-btn">Subscribe</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">STICKER<span>HAUS</span></div>
+      <p class="footer-tagline">Premium vinyl stickers made with love, precision, and a little bit of chaos. Stick your world.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <a href="#">New Arrivals</a>
+      <a href="#">Best Sellers</a>
+      <a href="#">Packs & Bundles</a>
+      <a href="#">Custom Orders</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About Us</a>
+      <a href="#">Blog</a>
+      <a href="#">Press</a>
+      <a href="#">Careers</a>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <a href="#">FAQ</a>
+      <a href="#">Shipping Policy</a>
+      <a href="#">Returns</a>
+      <a href="#">Contact Us</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 StickerHaus. All rights reserved.</span>
+    <span>Made with 💛 and vinyl</span>
+  </div>
+</footer>
+
+<!-- CART TOAST -->
+<div class="toast" id="toast">✅ Added to cart!</div>
+
+<script>
+// PACK CAROUSEL
+let packIndex = 0;
+const packTotal = document.querySelectorAll('#packTrack .pack-card').length;
+function updateCarousel() {
+  const track = document.getElementById('packTrack');
+  const card = track.querySelector('.pack-card');
+  const cardW = card.offsetWidth;
+  const gap = 24;
+  track.style.transform = `translateX(-${packIndex * (cardW + gap)}px)`;
+  document.querySelectorAll('.pack-dot').forEach((d,i) => d.classList.toggle('active', i === packIndex));
+  document.getElementById('packCounter').textContent = `${packIndex + 1} / ${packTotal}`;
+}
+function shiftPack(dir) {
+  packIndex = (packIndex + dir + packTotal) % packTotal;
+  updateCarousel();
+}
+function goToPack(i) {
+  packIndex = i;
+  updateCarousel();
+}
+window.addEventListener('resize', updateCarousel);
+
+// PACK DROPDOWN
+function toggleDropdown(btn) {
+  const list = btn.nextElementSibling;
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', !expanded);
+  if (expanded) { list.hidden = true; } else { list.hidden = false; }
+}
+
+// CURSOR
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a,button,.cat-card,.product-card,.testi-card,.pack-card,.sticker-card').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+});
+
+// SCROLL REVEAL
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), 80 * (entry.target.dataset.delay || 0));
+      observer.unobserve(entry.target);
+    }
+  });
+}, {threshold: 0.12});
+document.querySelectorAll('.reveal').forEach((el, i) => {
+  el.dataset.delay = i % 5;
+  observer.observe(el);
+});
+
+// 3D TILT on product cards
+document.querySelectorAll('.product-card,.pack-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `translate(-5px,-5px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.02)`;
+    card.style.boxShadow = `${8 + x*4}px ${8 + y*4}px 0 var(--ink)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    card.style.boxShadow = '';
+  });
+});
+
+// CART TOAST
+let cartCount = 0;
+const toast = document.getElementById('toast');
+const cartBtn = document.querySelector('.nav-cta');
+function addToCart(name) {
+  cartCount++;
+  cartBtn.textContent = `Cart (${cartCount})`;
+  toast.textContent = `✅ ${name} added!`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// STICKER CARD 3D on hero
+document.querySelectorAll('.sticker-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `translateY(-18px) rotateY(${x*20}deg) rotateX(${-y*20}deg) scale(1.1)`;
+    card.style.boxShadow = `${6+x*4}px ${12+y*6}px 0 rgba(0,0,0,0.25)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    card.style.boxShadow = '';
+  });
+});
+
+// PARALLAX on hero bg text
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const bg = document.querySelector('.hero-bg-text');
+  if (bg) bg.style.transform = `translate(-50%, calc(-50% + ${y*0.3}px))`;
+});
+</script>
+</body>
+</html>
